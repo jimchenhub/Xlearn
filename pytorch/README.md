@@ -1,37 +1,62 @@
 # Deep Transfer Learning on PyTorch
 
-This is a PyTorch library for deep transfer learning. We use the PyTorch version 0.2.0\_3. 
+This is a PyTorch library for deep transfer learning. ~~We use the PyTorch version 0.2.0\_3.~~  We use the pytorch version 0.4.0.
+
+
+
+#### Main Updates
+
+* Change Pytorch to version 0.4.0
+* Adapt to Python 3.6
+* Train on Windows and new CUDA
+
+#### ToDo
+
+* Adapt to Python 3.6
+* Adapt to new version of pytorch
+
+
 
 ## Prerequisites
-Linux or OSX
+~~Linux or OSX~~
 
-NVIDIA GPU + CUDA-7.5 or CUDA-8.0 and corresponding CuDNN
+~~NVIDIA GPU + CUDA-7.5 or CUDA-8.0 and corresponding CuDNN~~
 
-PyTorch
+~~PyTorch~~
 
-Python 2.7 (We have not test on Python 3 yet.)
+~~Python 2.7 (We have not test on Python 3 yet.)~~
+
+We test it on Windows 10
+
+NVIDIA GPU 1060 + CUDA 9.1 + CuDNN 7.1
+
+Pytorch 0.4.0
+
+Python 3.6
 
 ## Data Preparation
 ---------------
-In `data/office/*.txt`, we give the lists of three domains in [Office](https://cs.stanford.edu/~jhoffman/domainadapt/#datasets_code) dataset.
+In `data/office/*.txt`, we give the lists of three domains in [Office](https://cs.stanford.edu/~jhoffman/domainadapt/#datasets_code) dataset. 
+
+Data download from: [https://drive.google.com/file/d/0B4IapRTv9pJ1WGZVd1VDMmhwdlE/view](https://drive.google.com/file/d/0B4IapRTv9pJ1WGZVd1VDMmhwdlE/view)
 
 ## Training Model
 ---------------
 In `src` directory, you can use the following command to train the model.
-```
+```shell
 python train.py gpu_id
 ```
 
 To train your model with different methods or different datasets or different optimizers, you can construct your own configuration. We have given a example configuration in `train.py`. We will give some explanation.
 
-`config['loss']` is the loss configuration, you need to set the `name` parameter as the name of the loss you want to use `DAN`, `RTN` or `JAN`. You also need to set the `trade_off` parameter to set the trade-off between the classification loss and transfer loss. If you'd like to use different parateters for the specific loss, you can set `params`, which is a dictionary including the parameters of the specific loss. The parameters of each specific loss is in `loss.py`.
+`config['loss']` is the loss configuration, you need to set the `name` parameter as the name of the loss you want to use `DAN`, `RTN` or `JAN`. You also need to set the `trade_off` parameter to set the trade-off between the classification loss and transfer loss. If you'd like to use different parameters for the specific loss, you can set `params`, which is a dictionary including the parameters of the specific loss. The parameters of each specific loss is in `loss.py`.
 
 `config['data']` set the input dataset parameters. You can change the dataset to your dataset here.
 
 ## Citation
 If you use this library for your research, we would be pleased if you cite the following papers:
 
-```
+```latex
     @inproceedings{DBLP:conf/icml/LongC0J15,
       author    = {Mingsheng Long and
                    Yue Cao and
