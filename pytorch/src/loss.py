@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
 def EntropyLoss(input_):
     mask = input_.ge(0.000001)

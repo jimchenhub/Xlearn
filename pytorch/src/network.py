@@ -3,11 +3,12 @@ import torch
 import torch.nn as nn
 import torchvision
 from torchvision import models
-from torch.autograd import Variable
+
 
 class SilenceLayer(torch.autograd.Function):
   def __init__(self):
     pass
+
   def forward(self, input):
     return input * 1.0
 
@@ -22,7 +23,7 @@ class AlexNetFc(nn.Module):
     model_alexnet = models.alexnet(pretrained=True)
     self.features = model_alexnet.features
     self.classifier = nn.Sequential()
-    for i in xrange(6):
+    for i in range(6):
       self.classifier.add_module("classifier"+str(i), model_alexnet.classifier[i])
     self.__in_features = model_alexnet.classifier[6].in_features
   
@@ -34,6 +35,7 @@ class AlexNetFc(nn.Module):
 
   def output_num(self):
     return self.__in_features
+
 
 class ResNet18Fc(nn.Module):
   def __init__(self):
@@ -191,4 +193,5 @@ class ResNet152Fc(nn.Module):
   def output_num(self):
     return self.__in_features
 
-network_dict = {"AlexNet":AlexNetFc, "ResNet18":ResNet18Fc, "ResNet34":ResNet34Fc, "ResNet50":ResNet50Fc, "ResNet101":ResNet101Fc, "ResNet152":ResNet152Fc}
+network_dict = {"AlexNet":AlexNetFc, "ResNet18":ResNet18Fc, "ResNet34":ResNet34Fc, 
+                "ResNet50":ResNet50Fc, "ResNet101":ResNet101Fc, "ResNet152":ResNet152Fc}

@@ -1,21 +1,12 @@
 # Deep Transfer Learning on PyTorch
 
-This is a PyTorch library for deep transfer learning. ~~We use the PyTorch version 0.2.0\_3.~~  We use the pytorch version 0.4.0.
-
-
+This is a PyTorch library for deep transfer learning. ~~We use the PyTorch version 0.2.0\_3.~~  We update the version of  PyTorch to 0.4.0.
 
 #### Main Updates
 
 * Change Pytorch to version 0.4.0
 * Adapt to Python 3.6
 * Train on Windows and new CUDA
-
-#### ToDo
-
-* Adapt to Python 3.6
-* Adapt to new version of pytorch
-
-
 
 ## Prerequisites
 ~~Linux or OSX~~
@@ -44,7 +35,7 @@ Data download from: [https://drive.google.com/file/d/0B4IapRTv9pJ1WGZVd1VDMmhwdl
 ---------------
 In `src` directory, you can use the following command to train the model.
 ```shell
-python train.py gpu_id
+python train.py
 ```
 
 To train your model with different methods or different datasets or different optimizers, you can construct your own configuration. We have given a example configuration in `train.py`. We will give some explanation.
@@ -112,5 +103,6 @@ If you use this library for your research, we would be pleased if you cite the f
 
 ## Contact
 If you have any problem about this library, please create an Issue or send us an Email at:
+- jimchen0605@qq.com
 - caozhangjie14@gmail.com
 - longmingsheng@gmail.com
