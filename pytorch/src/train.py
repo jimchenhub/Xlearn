@@ -9,6 +9,7 @@ import torch.utils.data as util_data
 
 import network
 import loss
+from loss import DANLoss
 import pre_process as prep
 import lr_schedule
 from data_list import ImageList
@@ -117,10 +118,11 @@ def transfer_classification(config):
     ## set loss
     class_criterion = nn.CrossEntropyLoss()
     loss_config = config["loss"]
-    transfer_criterion = loss.loss_dict[loss_config["name"]]
+    # transfer_criterion = loss.loss_dict[loss_config["name"]]
     if "params" not in loss_config:
         loss_config["params"] = {}
     # print(transfer_criterion)
+    transfer_criterion = DANLoss(**loss_config["params"])
 
     ## prepare data
     dsets = {}
@@ -281,9 +283,12 @@ def transfer_classification(config):
         classifier_loss = class_criterion(outputs.narrow(0, 0, num), labels_source)
         ## switch between different transfer loss
         if loss_config["name"] == "DAN":
+            # transfer_loss = transfer_criterion(features.narrow(0, 0, num),
+            #                                    features.narrow(0, num, num),
+            #                                    **loss_config["params"])
+
             transfer_loss = transfer_criterion(features.narrow(0, 0, num),
-                                               features.narrow(0, num, num),
-                                               **loss_config["params"])
+                                               features.narrow(0, num, num))
         elif loss_config["name"] == "RTN":
             ## RTN is still under developing
             transfer_loss = 0
