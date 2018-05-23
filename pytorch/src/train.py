@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as util_data
+from tensorboardX import SummaryWriter
 
 import network
 import loss
@@ -100,6 +101,8 @@ def image_classification_test(loader, model, test_10crop=True, gpu=True):
 
 
 def transfer_classification(config):
+    # ---set log writer ---
+    writer = SummaryWriter(log_dir=config["log_dir"])
     # set pre-process
     prep_dict = {}
     for prep_config in config["prep"]:
@@ -236,18 +239,23 @@ def transfer_classification(config):
             classifier_layer.train(False)
             if net_config["use_bottleneck"]:
                 bottleneck_layer.train(False)
+                test_model = nn.Sequential(base_network, bottleneck_layer, classifier_layer)
                 test_acc = image_classification_test(dset_loaders["target"],
-                    nn.Sequential(base_network, bottleneck_layer, classifier_layer),
+                    test_model,
                     test_10crop=prep_dict["target"]["test_10crop"],
                     gpu=use_gpu)
                 print("iteration: %d, test accuracy: %f" % (i, test_acc))
 
             else:
+                test_model = nn.Sequential(base_network, classifier_layer)
                 test_acc = image_classification_test(dset_loaders["target"],
-                    nn.Sequential(base_network, classifier_layer),
+                    test_model,
                     test_10crop=prep_dict["target"]["test_10crop"],
                     gpu=use_gpu)
                 print("iteration: %d, test accuracy: %f" % (i, test_acc))
+            # save model parameters
+            if i % config["checkpoint_iterval"] == 0:
+                torch.save(test_model.state_dict(), config["checkpoint_dir"]+"checkpoint_"+str(i).zfill(5)+".pth")
 
         # loss_test = nn.BCELoss()
         # train one iter
@@ -294,12 +302,16 @@ def transfer_classification(config):
                                                **loss_config["params"])
 
         total_loss = loss_config["trade_off"] * transfer_loss + classifier_loss
-        if i % 20 == 0:
+        if i % 100 == 0:
             print("iteration: ", str(i), "\t transfer loss: ", str(transfer_loss.item()),
                   "\t classification loss: ", str(classifier_loss.item()),
                   "\t total loss: ", str(total_loss.item()))
             for param_group in optimizer.param_groups:
                 print("lr: ", param_group["lr"])
+            # log for losses
+            writer.add_scalar('Train/loss_classification', classifier_loss.item(), i//100)
+            writer.add_scalar('Train/loss_transfer', transfer_loss.item(), i//100)
+            writer.add_scalar('Train/loss_total', total_loss.item(), i//100)
         total_loss.backward()
         optimizer.step()
 
@@ -313,15 +325,17 @@ if __name__ == "__main__":
     config = {}
     config["num_iterations"] = 100000
     config["test_interval"] = 500
+    config["checkpoint_iterval"] = 5000
     config["prep"] = [{"name":"source", "type":"image", "test_10crop":False, "resize_size":256, "crop_size":224},
                       {"name":"target", "type":"image", "test_10crop":False, "resize_size":256, "crop_size":224}]
     config["loss"] = {"name":"DAN", "trade_off":1.0 }
-    config["data"] = [{"name":"source", "type":"image", "list_path":{"train":"../data/office/amazon_list.txt"}, 
-                            "batch_size":{"train":32, "test":1} },
+    config["data"] = [{"name":"source", "type":"image", "list_path":{"train":"../data/office/amazon_dslr_list.txt"}, 
+                            "batch_size":{"train":16, "test":1} },
                       {"name":"target", "type":"image", "list_path":{"train":"../data/office/webcam_list.txt"}, 
-                            "batch_size":{"train":32, "test":795}}]
-    config["network"] = {"name":"AlexNet", "use_bottleneck":False, "bottleneck_dim":256}
+                            "batch_size":{"train":16, "test":795}}]
+    config["network"] = {"name":"AlexNet", "use_bottleneck":True, "bottleneck_dim":256}
     config["optimizer"] = {"type":"SGD", "optim_params":{"lr":1.0, "momentum":0.9, "weight_decay":0.0005, "nesterov":True}, 
-                                "lr_type":"inv", "lr_param":{"init_lr":0.001, "gamma":0.001, "power":0.75} }
-
+                                "lr_type":"inv", "lr_param":{"init_lr":0.0003, "gamma":0.001, "power":0.75} }
+    config["log_dir"] = "../log/"
+    config["checkpoint_dir"] = "../checkpoint/"
     transfer_classification(config)

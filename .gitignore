@@ -1,5 +1,7 @@
 ## data
 pytorch/data/office/domain_adaptation_images
+pytorch/log/*
+pytorch/checkpoint/*
 
 ## General
 
